@@ -10,7 +10,7 @@ test_line = LineParser.parse_line(line='127.0.0.1 - - [01/Jan/1970:00:00:01] "GE
 class TestLineInstantiation:
     @pytest.mark.parametrize('expected,actual', [
         ('127.0.0.1', test_line.ip_address),
-        (1, test_line.timestamp),
+        ('01/Jan/1970:00:00:01', test_line.timestamp),
         ('GET', test_line.verb),
         ('/', test_line.path),
         (200, test_line.status),

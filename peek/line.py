@@ -1,3 +1,7 @@
+import datetime
+import time
+
+
 class Line:
     def __init__(self, row):
         self._ip_address = row[0]
@@ -15,7 +19,6 @@ class Line:
 
     @property
     def timestamp(self):
-        # TODO: Convert to number
         return self._timestamp
 
     @property
