@@ -1,7 +1,3 @@
-import datetime
-import time
-
-
 class Line:
     def __init__(self, row):
         self._ip_address = row[0]
