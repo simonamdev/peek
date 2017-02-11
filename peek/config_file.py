@@ -7,8 +7,10 @@ class ConfigurationFile:
         self.__validate_file()
 
     def __validate_file(self):
+        if not isinstance(self._file_path, str):
+            raise TypeError('Incorrect file path type')
         if not os.path.isfile(self._file_path):
-            raise FileNotFoundError
+            raise FileNotFoundError('File does not exist at path: {}'.format(self._file_path))
 
     @property
     def length(self):

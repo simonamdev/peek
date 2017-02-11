@@ -6,17 +6,23 @@ from tests.file_paths import test_log_file_path
 
 class TestConfigurationFileInstantiation:
     @pytest.mark.parametrize('file_path', [
-        None,
-        1,
-        2.0,
         '',
-        'foobar',
+        'foobar'
+    ])
+    def test_passing_non_existent_file_throws_exception(self, file_path):
+        with pytest.raises(FileNotFoundError):
+            ConfigurationFile(file_path=file_path)
+
+    @pytest.mark.parametrize('file_path', [
+        1,
+        None,
+        2.0,
         object,
         (),
         []
     ])
-    def test_passing_non_existent_file_throws_exception(self, file_path):
-        with pytest.raises(FileNotFoundError):
+    def test_passing_incorrect_params_throws_exception(self, file_path):
+        with pytest.raises(TypeError):
             ConfigurationFile(file_path=file_path)
 
     def test_passing_actual_file(self):
