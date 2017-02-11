@@ -5,9 +5,19 @@ from tests.file_paths import test_log_file_path
 
 
 class TestConfigurationFileInstantiation:
-    def test_passing_non_existent_file_throws_exception(self):
+    @pytest.mark.parametrize('file_path', [
+        None,
+        1,
+        2.0,
+        '',
+        'foobar',
+        object,
+        (),
+        []
+    ])
+    def test_passing_non_existent_file_throws_exception(self, file_path):
         with pytest.raises(FileNotFoundError):
-            ConfigurationFile(file_path='foobar')
+            ConfigurationFile(file_path=file_path)
 
     def test_passing_actual_file(self):
         ConfigurationFile(file_path=test_log_file_path)
