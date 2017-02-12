@@ -35,5 +35,4 @@ class LineParser:
             'referrer':   match[0][6],
             'user_agent': match[0][7]
         }
-        print(match[0][1])
         return Line(line_contents=line_contents)

@@ -1,10 +1,9 @@
-from peek.line import Line
 from peek.line_parser import LineParser
 from peek.log_statistics import LogStatistics
-from tests.unit.test_line import get_updated_line_contents
 
 test_string_one = '127.0.0.1 - - [01/Jan/1970:00:00:01 +0000] "GET / HTTP/1.1" 200 150 "-" "Python"'
-test_string_two = '127.0.0.2 - - [01/Jan/1970:00:00:01 +0000] "POST /api/ HTTP/1.1" 201 350 "ref" "Ruby"'
+test_string_two = '127.0.0.2 - - [01/Jan/1970:00:00:02 +0000] "POST /api/ HTTP/1.1" 201 350 "ref" "Ruby"'
+test_string_three = '127.0.0.2 - - [01/Jan/1970:00:00:03 +0000] "POST /api/ HTTP/1.1" 201 350 "ref" "Ruby"'
 
 
 class TestLogStatisticsInstantiation:
@@ -128,3 +127,13 @@ class TestLogStatistics:
         user_agent_occurrences = log_statistics.get_user_agent_occurrences()
         assert 2 == user_agent_occurrences['Python']
         assert 2 == user_agent_occurrences['Ruby']
+
+    def test_get_requests_per_second(self):
+        log_statistics = LogStatistics()
+        for i in range(0, 5):
+            log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
+        for i in range(0, 5):
+            log_statistics.insert_line(line=LineParser.parse_line(line=test_string_three))
+        assert 0.167 == log_statistics.get_requests_per_second_in_timestamp(
+            timespan_start=2,
+            timespan_end=3)

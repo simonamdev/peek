@@ -114,10 +114,13 @@ class LogStatistics:
     def get_user_agent_occurrences(self):
         return self.__get_number_of_occurrences(field='useragent')
 
-    # def get_requests_per_second(self):
-    #     rps_query = 'SELECT COUNT(*)' \
-    #                 'FROM `logs`' \
-    #                 'WHERE '
+    def get_requests_per_second_in_timestamp(self, timespan_start, timespan_end):
+        rps_query = 'SELECT COUNT(*)' \
+                    'FROM `logs`' \
+                    'WHERE timestamp >= ? AND timestamp <= ?'
+        rps_data = (timespan_start, timespan_end)
+        query_amount = self._cursor.execute(rps_query, rps_data).fetchone()[0]
+        return round(query_amount / 60, 3)
 
     def __get_number_of_occurrences(self, field):
         select_query = 'SELECT {}, COUNT({})' \
