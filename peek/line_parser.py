@@ -18,11 +18,21 @@ class LineParser:
                '"(GET|POST)\s'                  # verb
                '(.+)\s\w+/.+"\s'                # path
                '(\d+)\s'                        # status
-               '(\d+)\s'                        # bytes sent
+               '(\d+)\s'                        # size
                '"(.+)"\s'                       # referrer
                '"(.+)"'                         # useragent
                )
         match = re.findall(pat, line)
         if not match:
             return None
-        return Line(match[0])
+        line_contents = {
+            'ip_address': match[0][0],
+            'timestamp':  match[0][1],
+            'verb':       match[0][2],
+            'path':       match[0][3],
+            'status':     match[0][4],
+            'size':       match[0][5],
+            'referrer':   match[0][6],
+            'user_agent': match[0][7]
+        }
+        return Line(line_contents=line_contents)

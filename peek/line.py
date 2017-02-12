@@ -2,15 +2,8 @@ import re
 
 
 class Line:
-    def __init__(self, row):
-        self._ip_address = row[0]
-        self._timestamp = row[1].replace('[', '').replace(']', '')
-        self._verb = row[2]
-        self._path = row[3]
-        self._status = row[4]
-        self._byte_count = row[5]
-        self._referrer = row[6]
-        self._user_agent = row[7]
+    def __init__(self, line_contents):
+        self._line_contents = line_contents
         self.__validate()
 
     def __validate(self):
@@ -18,45 +11,45 @@ class Line:
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b'
-        match = re.findall(ip_pattern, self._ip_address)
+        match = re.findall(ip_pattern, self.ip_address)
         if len(match) == 0:
             raise InvalidIpAddressException
         try:
-            int(self._status)
+            int(self.status)
         except ValueError:
             raise InvalidStatusException
 
     @property
     def ip_address(self):
-        return self._ip_address
+        return self._line_contents['ip_address']
 
     @property
     def timestamp(self):
-        return self._timestamp
+        return self._line_contents['timestamp'].replace('[', '').replace(']', '')
 
     @property
     def verb(self):
-        return self._verb
+        return self._line_contents['verb']
 
     @property
     def path(self):
-        return self._path
+        return self._line_contents['path']
 
     @property
     def status(self):
-        return int(self._status)
+        return int(self._line_contents['status'])
 
     @property
     def byte_count(self):
-        return int(self._byte_count)
+        return int(self._line_contents['size'])
 
     @property
     def referrer(self):
-        return self._referrer
+        return self._line_contents['referrer']
 
     @property
     def user_agent(self):
-        return self._user_agent
+        return self._line_contents['user_agent']
 
 
 class InvalidIpAddressException(ValueError):
