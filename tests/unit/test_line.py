@@ -4,10 +4,10 @@ import pytest
 
 from peek.line import InvalidIpAddressException, Line, InvalidStatusException
 
-# 127.0.0.1 - - [01/Jan/1970:00:00:01] "GET / HTTP/1.1" 200 193 "-" "Python"
+# 127.0.0.1 - - [01/Jan/1970:00:00:01 +0000] "GET / HTTP/1.1" 200 193 "-" "Python"
 test_line_contents = {
     'ip_address': '127.0.0.1',
-    'timestamp':  '[01/Jan/1970:00:00:01]',
+    'timestamp':  '[01/Jan/1970:00:00:01 +0000]',
     'verb':       'GET',
     'path':       '/',
     'status':     '200',
@@ -30,7 +30,7 @@ test_line = Line(line_contents=test_line_contents)
 class TestLineInstantiation:
     @pytest.mark.parametrize('expected,actual', [
         ('127.0.0.1', test_line.ip_address),
-        ('01/Jan/1970:00:00:01', test_line.timestamp),
+        (1, test_line.timestamp),
         ('GET', test_line.verb),
         ('/', test_line.path),
         (200, test_line.status),
@@ -45,10 +45,8 @@ class TestLineInstantiation:
 class TestLineExceptions:
     def test_passing_invalid_ip_address_throws_exception(self):
         with pytest.raises(InvalidIpAddressException):
-            Line(get_updated_line_contents({'ip_address': 'foobar'}))
+            line = Line(line_contents=get_updated_line_contents({'ip_address': 'foobar'}))
 
     def test_passing_non_parseable_status_throws_exception(self):
-        test_contents = copy.deepcopy(test_line_contents)
-        test_contents['status'] = 'foobar'
         with pytest.raises(InvalidStatusException):
-            Line(get_updated_line_contents({'status': 'foobar'}))
+            Line(line_contents=get_updated_line_contents({'status': 'foobar'}))

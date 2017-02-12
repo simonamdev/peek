@@ -3,8 +3,8 @@ from peek.line_parser import LineParser
 from peek.log_statistics import LogStatistics
 from tests.unit.test_line import get_updated_line_contents
 
-test_string_one = '127.0.0.1 - - [01/Jan/1970:00:00:01] "GET / HTTP/1.1" 200 150 "-" "Python"'
-test_string_two = '127.0.0.2 - - [01/Jan/1970:00:00:01] "POST /api/ HTTP/1.1" 201 350 "ref" "Ruby"'
+test_string_one = '127.0.0.1 - - [01/Jan/1970:00:00:01 +0000] "GET / HTTP/1.1" 200 150 "-" "Python"'
+test_string_two = '127.0.0.2 - - [01/Jan/1970:00:00:01 +0000] "POST /api/ HTTP/1.1" 201 350 "ref" "Ruby"'
 
 
 class TestLogStatisticsInstantiation:
@@ -27,20 +27,19 @@ class TestLogStatistics:
         assert [] == log_statistics.get_all_lines()
 
     def test_inserting_and_retrieving_logs(self):
-        line_contents = get_updated_line_contents()
         log_statistics = LogStatistics()
-        test_line = Line(line_contents=line_contents)
+        test_line = LineParser.parse_line(line=test_string_one)
         log_statistics.insert_line(line=test_line)
         assert 1 == log_statistics.lines_stored
         lines = log_statistics.get_all_lines()
-        assert lines[0].ip_address == test_line.ip_address
-        assert lines[0].timestamp == test_line.timestamp
-        assert lines[0].verb == test_line.verb
-        assert lines[0].path == test_line.path
-        assert lines[0].status == test_line.status
-        assert lines[0].byte_count == test_line.byte_count
-        assert lines[0].referrer == test_line.referrer
-        assert lines[0].user_agent == test_line.user_agent
+        assert test_line.ip_address == lines[0].ip_address
+        assert 1 == lines[0].timestamp
+        assert test_line.verb == lines[0].verb
+        assert test_line.path == lines[0].path
+        assert test_line.status == lines[0].status
+        assert test_line.byte_count == lines[0].byte_count
+        assert test_line.referrer == lines[0].referrer
+        assert test_line.user_agent == lines[0].user_agent
 
     def test_inserting_none_has_no_effect(self):
         log_statistics = LogStatistics()

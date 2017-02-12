@@ -2,6 +2,7 @@ import pytest
 
 from peek.line import Line
 from peek.line_parser import LineParser
+from tests.unit.test_log_statistics import test_string_one
 
 
 class TestLineParser:
@@ -24,5 +25,5 @@ class TestLineParser:
         assert None is LineParser.parse_line('blablablabla')
 
     def test_passing_valid_line_returns_line(self):
-        line = LineParser.parse_line('127.0.0.1 - - [01/Jan/1970:00:00:01] "GET / HTTP/1.1" 200 193 "-" "Python"')
+        line = LineParser.parse_line(test_string_one)
         assert isinstance(line, Line)

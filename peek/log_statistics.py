@@ -19,7 +19,7 @@ class LogStatistics:
         create_table_query = 'CREATE TABLE IF NOT EXISTS `logs` (' \
                              'id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
                              'ip        TEXT NOT NULL,' \
-                             'timestamp TEXT NOT NULL,' \
+                             'timestamp INTEGER NOT NULL,' \
                              'verb      TEXT NOT NULL,' \
                              'path      TEXT NOT NULL,' \
                              'status    INTEGER NOT NULL,' \
@@ -113,6 +113,11 @@ class LogStatistics:
 
     def get_user_agent_occurrences(self):
         return self.__get_number_of_occurrences(field='useragent')
+
+    # def get_requests_per_second(self):
+    #     rps_query = 'SELECT COUNT(*)' \
+    #                 'FROM `logs`' \
+    #                 'WHERE '
 
     def __get_number_of_occurrences(self, field):
         select_query = 'SELECT {}, COUNT({})' \

@@ -1,3 +1,4 @@
+import datetime
 import re
 
 
@@ -7,6 +8,7 @@ class Line:
         self.__validate()
 
     def __validate(self):
+
         ip_pattern = '\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
@@ -18,6 +20,17 @@ class Line:
             int(self.status)
         except ValueError:
             raise InvalidStatusException
+        self.__convert_timestamp()
+
+    def __convert_timestamp(self):
+        if isinstance(self._line_contents['timestamp'], int):
+            return
+        # Convert the timestamp
+        timestamp_format = '%d/%b/%Y:%H:%M:%S %z'
+        if '[' in self._line_contents['timestamp']:
+            timestamp_format = '[' + timestamp_format + ']'
+        self._line_contents['timestamp'] = int(
+            datetime.datetime.strptime(self._line_contents['timestamp'], timestamp_format).timestamp())
 
     @property
     def ip_address(self):
@@ -25,7 +38,7 @@ class Line:
 
     @property
     def timestamp(self):
-        return self._line_contents['timestamp'].replace('[', '').replace(']', '')
+        return self._line_contents['timestamp']
 
     @property
     def verb(self):
