@@ -12,7 +12,7 @@ class Line:
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                      '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b'
-        match = re.findall(ip_pattern, self.ip_address)
+        match = re.findall(ip_pattern, self._line_contents['ip_address'])
         if len(match) == 0:
             raise InvalidIpAddressException
         try:
@@ -22,14 +22,13 @@ class Line:
         self.__convert_timestamp()
 
     def __convert_timestamp(self):
-        if isinstance(self._line_contents['timestamp'], int):
-            return
-        # Convert the timestamp
-        timestamp_format = '%d/%b/%Y:%H:%M:%S %z'
-        if '[' in self._line_contents['timestamp']:
-            timestamp_format = '[' + timestamp_format + ']'
-        self._line_contents['timestamp'] = int(
-            datetime.datetime.strptime(self._line_contents['timestamp'], timestamp_format).timestamp())
+        if not isinstance(self._line_contents['timestamp'], int):
+            # Convert the timestamp
+            timestamp_format = '%d/%b/%Y:%H:%M:%S %z'
+            if '[' in self._line_contents['timestamp']:
+                timestamp_format = '[' + timestamp_format + ']'
+            self._line_contents['timestamp'] = int(
+                datetime.datetime.strptime(self._line_contents['timestamp'], timestamp_format).timestamp())
 
     @property
     def ip_address(self):

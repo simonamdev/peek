@@ -28,14 +28,13 @@ class PeekRunner:
         print('Peeking into nginx logs')
         for incoming_connection_log in watch_file(file_path=self._log_file.file_path):
             self._lines_parsed += 1
-            current_line = Line(line_contents=LineParser.parse_line(line=incoming_connection_log))
+            current_line = LineParser.parse_line(line=incoming_connection_log)
             self._log_statistics.insert_line(line=current_line)
             self.report_statistics()
 
     def report_statistics(self):
-        print('                                 ')
         current_time, one_minute_ago = int(time.time()), int(time.time()) - 60
         rps = self._log_statistics.get_requests_per_second_in_timestamp(
             timespan_start=one_minute_ago,
             timespan_end=current_time)
-        print('Requests per second: {}'.format(rps), end='\r')
+        print('Requests per second in the last 60 seconds: {}    '.format(rps), end='\r')
