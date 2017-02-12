@@ -4,7 +4,7 @@ import re
 class Line:
     def __init__(self, row):
         self._ip_address = row[0]
-        self._timestamp = row[1]
+        self._timestamp = row[1].replace('[', '').replace(']', '')
         self._verb = row[2]
         self._path = row[3]
         self._status = row[4]
@@ -32,7 +32,7 @@ class Line:
 
     @property
     def timestamp(self):
-        return self._timestamp.replace('[', '').replace(']', '')
+        return self._timestamp
 
     @property
     def verb(self):
