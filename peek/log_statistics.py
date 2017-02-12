@@ -15,14 +15,14 @@ class LogStatistics:
 
     def __initialise_database(self):
         create_table_query = 'CREATE TABLE IF NOT EXISTS `logs` (' \
-                             'id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
-                             'ip TEXT NOT NULL,' \
+                             'id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
+                             'ip        TEXT NOT NULL,' \
                              'timestamp INTEGER NOT NULL,' \
-                             'verb TEXT NOT NULL,' \
-                             'path TEXT NOT NULL,' \
-                             'status INTEGER NOT NULL,' \
-                             'size INTEGER NOT NULL,' \
-                             'referrer TEXT NOT NULL,' \
+                             'verb      TEXT NOT NULL,' \
+                             'path      TEXT NOT NULL,' \
+                             'status    INTEGER NOT NULL,' \
+                             'size      INTEGER NOT NULL,' \
+                             'referrer  TEXT NOT NULL,' \
                              'useragent TEXT NOT NULL' \
                              ');'
         self._cursor.execute(create_table_query)
