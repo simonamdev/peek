@@ -14,17 +14,13 @@ def watch_file(file_path, delay=0.1):
             time.sleep(delay)
 
 
-class Peek:
+class PeekRunner:
     def __init__(self, file_path):
         self._log_file = LogFile(file_path=file_path)
         self._original_line_count = self._log_file.length
         self._lines_parsed = 0
 
-    def parse_file(self):
+    def parse_logs(self):
         for incoming_connection in watch_file(file_path=self._log_file.file_path):
             self._lines_parsed += 1
             print('[{}] - {}'.format(self._lines_parsed, incoming_connection))
-
-
-if __name__ == '__main__':
-    pass
