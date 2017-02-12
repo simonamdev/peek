@@ -15,6 +15,15 @@ line_contents = {
     'referrer':   '-',
     'user_agent': 'Python'
 }
+
+
+def get_updated_line_contents(updates=None):
+    test_contents = copy.deepcopy(line_contents)
+    if updates is not None:
+        test_contents.update(updates)
+    return test_contents
+
+
 test_line = Line(line_contents=line_contents)
 
 
@@ -35,13 +44,11 @@ class TestLineInstantiation:
 
 class TestLineExceptions:
     def test_passing_invalid_ip_address_throws_exception(self):
-        test_contents = copy.deepcopy(line_contents)
-        test_contents['ip_address'] = 'foobar'
         with pytest.raises(InvalidIpAddressException):
-            Line(test_contents)
+            Line(get_updated_line_contents({'ip_address': 'foobar'}))
 
     def test_passing_non_parseable_status_throws_exception(self):
         test_contents = copy.deepcopy(line_contents)
         test_contents['status'] = 'foobar'
         with pytest.raises(InvalidStatusException):
-            Line(test_contents)
+            Line(get_updated_line_contents({'status': 'foobar'}))
