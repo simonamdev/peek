@@ -9,3 +9,15 @@ class TestLogStatisticsInstantiation:
     def test_starting_with_persistence(self):
         log_statistics = LogStatistics(persist=True)
         assert True is log_statistics.persistence_mode
+
+
+class TestLogStatistics:
+    def test_new_non_persistent_line_count_is_0(self):
+        log_statistics = LogStatistics()
+        assert 0 == log_statistics.lines_stored
+
+    # def test_retrieving_logs(self):
+    #     pass
+    #
+    # def test_inserting_logs(self):
+    #     pass
