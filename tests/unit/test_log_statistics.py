@@ -1,6 +1,10 @@
 from peek.line import Line
+from peek.line_parser import LineParser
 from peek.log_statistics import LogStatistics
 from tests.unit.test_line import get_updated_line_contents
+
+test_string_one = '127.0.0.1 - - [01/Jan/1970:00:00:01] "GET / HTTP/1.1" 200 193 "-" "Python"'
+test_string_two = '127.0.0.2 - - [01/Jan/1970:00:00:01] "POST / HTTP/1.1" 201 304 "-" "Ruby"'
 
 
 class TestLogStatisticsInstantiation:
@@ -37,3 +41,19 @@ class TestLogStatistics:
         assert lines[0].byte_count == test_line.byte_count
         assert lines[0].referrer == test_line.referrer
         assert lines[0].user_agent == test_line.user_agent
+
+    def test_inserting_none_has_no_effect(self):
+        log_statistics = LogStatistics()
+        assert 0 == log_statistics.lines_stored
+        log_statistics.insert_line(line=None)
+        assert 0 == log_statistics.lines_stored
+
+    def test_retrieving_number_of_ip_occurrences(self):
+        log_statistics = LogStatistics()
+        for i in range(0, 10):
+            log_statistics.insert_line(line=LineParser.parse_line(line=test_string_one))
+        for i in range(0, 5):
+            log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
+        ip_address_occurrences = log_statistics.get_ip_address_occurrences()
+        assert 10 == ip_address_occurrences['127.0.0.1']
+        assert 5 == ip_address_occurrences['127.0.0.2']

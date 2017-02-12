@@ -60,6 +60,8 @@ class LogStatistics:
         return [self.convert_row_to_line(row=row) for row in result]
 
     def insert_line(self, line):
+        if line is None:
+            return
         insert_query = 'INSERT INTO `logs` (' \
                        'ip,' \
                        'timestamp,' \
@@ -80,3 +82,15 @@ class LogStatistics:
                        line.user_agent)
         self._cursor.execute(insert_query, insert_data)
         self._connection.commit()
+
+    def get_ip_address_occurrences(self):
+        return self.get_number_of_occurrences(field='ip')
+
+    def get_number_of_occurrences(self, field):
+        select_query = 'SELECT {}, COUNT({})' \
+                       'FROM `logs`' \
+                       'GROUP BY {}'.format(field, field, field)
+        occurrences = {}
+        for row in self._cursor.execute(select_query).fetchmany(size=5):
+            occurrences[row[0]] = row[1]
+        return occurrences
