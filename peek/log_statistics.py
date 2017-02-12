@@ -84,12 +84,40 @@ class LogStatistics:
         self._connection.commit()
 
     def get_ip_address_occurrences(self):
-        return self.get_number_of_occurrences(field='ip')
+        return self.__get_number_of_occurrences(field='ip')
 
-    def get_number_of_occurrences(self, field):
+    def get_number_of_distinct_ip_addresses(self):
+        select_query = 'SELECT DISTINCT COUNT(ip)' \
+                       'FROM `logs`;'
+        return self._cursor.execute(select_query).fetchall()[0][0]
+
+    def get_verb_occurrences(self):
+        return self.__get_number_of_occurrences(field='verb')
+
+    def get_path_occurrences(self):
+        return self.__get_number_of_occurrences(field='path')
+
+    def get_status_occurrences(self):
+        return self.__get_number_of_occurrences(field='status')
+
+    def get_average_byte_count(self):
+        average_query = 'SELECT AVG(size) FROM `logs`'
+        return self._cursor.execute(average_query).fetchone()[0]
+
+    def get_total_byte_count(self):
+        total_query = 'SELECT SUM(size) FROM `logs`'
+        return self._cursor.execute(total_query).fetchone()[0]
+
+    def get_referrer_occurrences(self):
+        return self.__get_number_of_occurrences(field='referrer')
+
+    def get_user_agent_occurrences(self):
+        return self.__get_number_of_occurrences(field='useragent')
+
+    def __get_number_of_occurrences(self, field):
         select_query = 'SELECT {}, COUNT({})' \
                        'FROM `logs`' \
-                       'GROUP BY {}'.format(field, field, field)
+                       'GROUP BY {};'.format(field, field, field)
         occurrences = {}
         for row in self._cursor.execute(select_query).fetchmany(size=5):
             occurrences[row[0]] = row[1]
