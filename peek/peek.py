@@ -1,18 +1,30 @@
 import time
 
-from tests.file_paths import real_log_file_path
+from peek.log_file import LogFile
 
 
-def watch_file(file_path):
+def watch_file(file_path, delay=0.1):
     with open(file_path, 'r') as log_file:
         # Go to the end of the file
         log_file.seek(0, 2)
-        line = log_file.readline()
-        if line:
-            yield line
-        time.sleep(1)
+        while True:
+            line = log_file.readline()
+            if line and not line == '\n':
+                yield line
+            time.sleep(delay)
+
+
+class Peek:
+    def __init__(self, file_path):
+        self._log_file = LogFile(file_path=file_path)
+        self._original_line_count = self._log_file.length
+        self._lines_parsed = 0
+
+    def parse_file(self):
+        for incoming_connection in watch_file(file_path=self._log_file.file_path):
+            self._lines_parsed += 1
+            print('[{}] - {}'.format(self._lines_parsed, incoming_connection))
 
 
 if __name__ == '__main__':
-    for incoming_line in watch_file(real_log_file_path):
-        print(incoming_line)
+    pass

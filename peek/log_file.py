@@ -1,7 +1,7 @@
 import os
 
 
-class ConfigurationFile:
+class LogFile:
     def __init__(self, file_path):
         self._file_path = file_path
         self.__validate_file()
@@ -11,6 +11,10 @@ class ConfigurationFile:
             raise TypeError('Incorrect file path type')
         if not os.path.isfile(self._file_path):
             raise FileNotFoundError('File does not exist at path: {}'.format(self._file_path))
+
+    @property
+    def file_path(self):
+        return self._file_path
 
     @property
     def length(self):
