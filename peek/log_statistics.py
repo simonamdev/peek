@@ -19,7 +19,7 @@ class LogStatistics:
         create_table_query = 'CREATE TABLE IF NOT EXISTS `logs` (' \
                              'id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,' \
                              'ip        TEXT NOT NULL,' \
-                             'timestamp INTEGER NOT NULL,' \
+                             'timestamp TEXT NOT NULL,' \
                              'verb      TEXT NOT NULL,' \
                              'path      TEXT NOT NULL,' \
                              'status    INTEGER NOT NULL,' \
@@ -60,4 +60,23 @@ class LogStatistics:
         return [self.convert_row_to_line(row=row) for row in result]
 
     def insert_line(self, line):
-        pass
+        insert_query = 'INSERT INTO `logs` (' \
+                       'ip,' \
+                       'timestamp,' \
+                       'verb,' \
+                       'path,' \
+                       'status,' \
+                       'size,' \
+                       'referrer,' \
+                       'useragent)' \
+                       'VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
+        insert_data = (line.ip_address,
+                       line.timestamp,
+                       line.verb,
+                       line.path,
+                       line.status,
+                       line.byte_count,
+                       line.referrer,
+                       line.user_agent)
+        self._cursor.execute(insert_query, insert_data)
+        self._connection.commit()

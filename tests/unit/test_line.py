@@ -5,7 +5,7 @@ import pytest
 from peek.line import InvalidIpAddressException, Line, InvalidStatusException
 
 # 127.0.0.1 - - [01/Jan/1970:00:00:01] "GET / HTTP/1.1" 200 193 "-" "Python"
-line_contents = {
+test_line_contents = {
     'ip_address': '127.0.0.1',
     'timestamp':  '[01/Jan/1970:00:00:01]',
     'verb':       'GET',
@@ -18,13 +18,13 @@ line_contents = {
 
 
 def get_updated_line_contents(updates=None):
-    test_contents = copy.deepcopy(line_contents)
+    test_contents = copy.deepcopy(test_line_contents)
     if updates is not None:
         test_contents.update(updates)
     return test_contents
 
 
-test_line = Line(line_contents=line_contents)
+test_line = Line(line_contents=test_line_contents)
 
 
 class TestLineInstantiation:
@@ -48,7 +48,7 @@ class TestLineExceptions:
             Line(get_updated_line_contents({'ip_address': 'foobar'}))
 
     def test_passing_non_parseable_status_throws_exception(self):
-        test_contents = copy.deepcopy(line_contents)
+        test_contents = copy.deepcopy(test_line_contents)
         test_contents['status'] = 'foobar'
         with pytest.raises(InvalidStatusException):
             Line(get_updated_line_contents({'status': 'foobar'}))
