@@ -33,4 +33,9 @@ class PeekRunner:
             self.report_statistics()
 
     def report_statistics(self):
-        pass
+        print('                                 ')
+        current_time, one_minute_ago = int(time.time()), int(time.time()) - 60
+        rps = self._log_statistics.get_requests_per_second_in_timestamp(
+            timespan_start=one_minute_ago,
+            timespan_end=current_time)
+        print('Requests per second: {}'.format(rps), end='\r')
