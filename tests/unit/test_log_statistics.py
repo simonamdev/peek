@@ -16,8 +16,10 @@ class TestLogStatistics:
         log_statistics = LogStatistics()
         assert 0 == log_statistics.lines_stored
 
-    # def test_retrieving_logs(self):
-    #     pass
+    def test_new_non_persistent_retrieval_is_empty(self):
+        log_statistics = LogStatistics()
+        assert [] == log_statistics.get_all_lines()
+
     #
     # def test_inserting_logs(self):
     #     pass
