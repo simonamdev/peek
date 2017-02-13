@@ -1,4 +1,7 @@
+import os
 import time
+
+from tabulate import tabulate
 
 from peek.line import Line
 from peek.line_parser import LineParser
@@ -33,8 +36,28 @@ class PeekRunner:
             self.report_statistics()
 
     def report_statistics(self):
-        current_time, one_minute_ago = int(time.time()), int(time.time()) - 60
+        current_time = int(time.time())
+        one_minute_ago = int(time.time()) - 60
         rps = self._log_statistics.get_requests_per_second_in_timestamp(
             timespan_start=one_minute_ago,
             timespan_end=current_time)
-        print('Requests per second in the last 60 seconds: {}    '.format(rps), end='\r')
+        get_count = self._log_statistics.get_verb_occurrences()['GET']
+        total_bytes_sent = self._log_statistics.get_total_byte_count()
+        average_bytes_sent = self._log_statistics.get_average_byte_count()
+        # print('Requests per second in the last 60 seconds: {}    '.format(rps), end='\r')
+        self.clear_screen()
+        stats = [
+            ['Requests per Second', rps],
+            ['GET count', get_count],
+            ['Total Bytes sent', total_bytes_sent],
+            ['Average Bytes sent per request', average_bytes_sent]
+        ]
+        print('Nginx Statistics')
+        print(tabulate(tabular_data=stats, tablefmt='grid', numalign='right'))
+
+    @staticmethod
+    def clear_screen():
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
