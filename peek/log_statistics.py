@@ -87,7 +87,7 @@ class LogStatistics:
         return self.__get_number_of_occurrences(field='ip')
 
     def get_number_of_distinct_ip_addresses(self):
-        select_query = 'SELECT DISTINCT COUNT(ip)' \
+        select_query = 'SELECT COUNT(DISTINCT ip)' \
                        'FROM `logs`;'
         return self._cursor.execute(select_query).fetchall()[0][0]
 

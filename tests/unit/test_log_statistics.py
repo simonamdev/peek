@@ -59,6 +59,9 @@ class TestLogStatistics:
     def test_retrieving_number_of_distinct_ip_addresses(self):
         log_statistics = LogStatistics()
         log_statistics.insert_line(line=LineParser.parse_line(line=test_string_one))
+        log_statistics.insert_line(line=LineParser.parse_line(line=test_string_one))
+        log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
+        log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
         log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
         assert 2 == log_statistics.get_number_of_distinct_ip_addresses()
 
