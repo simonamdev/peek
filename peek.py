@@ -13,9 +13,9 @@ def create_peek_args_parser():
         type=str,
         help='Nginx log file path')
     parser.add_argument(
-        '--debug',
-        dest='debug',
-        help='Run Peek in debug mode (currently does nothing)',
+        '--persist',
+        dest='persist',
+        help='Persist parsed nginx logs to an SQLite database',
         action='store_true')
     return parser
 
@@ -23,7 +23,7 @@ def create_peek_args_parser():
 if __name__ == '__main__':
     args = create_peek_args_parser().parse_args()
     # TODO: Add logging and pass in args debug flag to change level
-    peek_runner = PeekRunner(file_path=args.file_path)
+    peek_runner = PeekRunner(file_path=args.file_path, persist=args.persist)
     try:
         peek_runner.parse_logs()
     except KeyboardInterrupt:
