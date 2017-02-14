@@ -21,6 +21,8 @@ def watch_file(file_path, delay=0.1):
 
 
 class PeekRunner:
+    version = '0.1'
+
     def __init__(self, file_path, persist=False):
         self._log_file = LogFile(file_path=file_path)
         self._original_line_count = self._log_file.length
