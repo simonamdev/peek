@@ -1,6 +1,7 @@
 import os
 import time
 
+from prettytable import PrettyTable
 from tabulate import tabulate
 
 from peek.line import Line
@@ -57,7 +58,10 @@ class PeekRunner:
 
         ]
         print('Nginx Statistics')
-        print(tabulate(tabular_data=stats, tablefmt='grid', numalign='right'))
+        table = PrettyTable(border=True, header=False, left_padding_width=5, align='l')
+        for stat in stats:
+            table.add_row(stat)
+        print(table)
 
     @staticmethod
     def clear_screen():
