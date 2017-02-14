@@ -47,7 +47,6 @@ class PeekRunner:
         total_bytes_sent = self._log_statistics.get_total_byte_count()
         average_bytes_sent = self._log_statistics.get_average_byte_count()
         distinct_ip_count = self._log_statistics.get_number_of_distinct_ip_addresses()
-        # print('Requests per second in the last 60 seconds: {}    '.format(rps), end='\r')
         self.clear_screen()
         stats = [
             ['Requests per Second', rps],
