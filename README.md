@@ -9,7 +9,7 @@ Get a quick peek into how nginx is performing by parsing the access log and gene
 
 ## Usage
 
-![](https://gfycat.com/DetailedDaringAsiaticwildass)
+![](https://thumbs.gfycat.com/DetailedDaringAsiaticwildass-size_restricted.gif)
 
 For taking a quick look, which stores the statistics in an in-memory instance of SQLite:
 
