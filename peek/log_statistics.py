@@ -91,6 +91,14 @@ class LogStatistics:
                        'FROM `logs`;'
         return self._cursor.execute(select_query).fetchall()[0][0]
 
+    def get_number_of_distinct_ip_addresses_in_timespan(self, timespan_start, timespan_end):
+        ip_query = 'SELECT COUNT(DISTINCT ip)' \
+                   'FROM `logs`' \
+                   'WHERE timestamp >= ? AND timestamp <= ?'
+        ip_data = (timespan_start, timespan_end)
+        query_amount = self._cursor.execute(ip_query, ip_data).fetchone()[0]
+        return round(query_amount / 60, 2)
+
     def get_verb_occurrences(self):
         return self.__get_number_of_occurrences(field='verb')
 
@@ -114,7 +122,7 @@ class LogStatistics:
     def get_user_agent_occurrences(self):
         return self.__get_number_of_occurrences(field='useragent')
 
-    def get_requests_per_second_in_timestamp(self, timespan_start, timespan_end):
+    def get_requests_per_second_in_timespan(self, timespan_start, timespan_end):
         rps_query = 'SELECT COUNT(*)' \
                     'FROM `logs`' \
                     'WHERE timestamp >= ? AND timestamp <= ?'

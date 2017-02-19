@@ -137,6 +137,6 @@ class TestLogStatistics:
             log_statistics.insert_line(line=LineParser.parse_line(line=test_string_two))
         for i in range(0, 5):
             log_statistics.insert_line(line=LineParser.parse_line(line=test_string_three))
-        assert 0.167 == log_statistics.get_requests_per_second_in_timestamp(
+        assert 0.167 == log_statistics.get_requests_per_second_in_timespan(
             timespan_start=2,
             timespan_end=3)
