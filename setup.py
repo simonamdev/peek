@@ -8,4 +8,4 @@ setup(name='peek',
       author_email='simon@agius-muscat.net',
       license='',
       packages=['peek'],
-      zip_safe=False, install_requires=['pytest'])
+      zip_safe=False, install_requires=['pytest', 'tabulate'])
