@@ -87,4 +87,4 @@ class PeekViewer:
 if __name__ == '__main__':
     import cProfile
     pv = PeekViewer(log_file_path=test_log_file_path, db_path='logs')
-    cProfile.run('pv.report_statistics()')
+    cProfile.run('pv.report_statistics()', sort=1)
