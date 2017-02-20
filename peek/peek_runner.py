@@ -19,11 +19,11 @@ def watch_file(file_path, delay=0.1):
 class PeekRunner:
     version = '0.1'
 
-    def __init__(self, file_path, persist=False):
+    def __init__(self, file_path):
         self._log_file = LogFile(file_path=file_path)
         self._original_line_count = self._log_file.length
         self._lines_parsed = 0
-        self._log_statistics = LogStatistics(persist=persist)
+        self._log_statistics = LogStatistics(persist=True)
 
     def parse_logs(self):
         print('Peeking into nginx logs')

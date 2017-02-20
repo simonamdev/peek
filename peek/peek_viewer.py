@@ -8,14 +8,18 @@ from peek.log_statistics import LogStatistics
 
 
 class PeekViewer:
-    def __init__(self, db_path):
+    def __init__(self, log_file_path, db_path, refresh_rate=1):
+        self._log_file_path = log_file_path
         self._db_path = db_path
+        self._refresh_rate = refresh_rate
         self._log_statistics = LogStatistics(persist=True)
 
     def run(self):
         print('Viewing nginx log statistics')
         while True:
+            self.clear_screen()
             self.report_statistics()
+            time.sleep(self._refresh_rate)
 
     def report_statistics(self):
         current_time = int(time.time())
@@ -29,7 +33,6 @@ class PeekViewer:
         distinct_ip_count_in_timespan = self._log_statistics.get_number_of_distinct_ip_addresses_in_timespan(
             timespan_start=one_minute_ago,
             timespan_end=current_time)
-        self.clear_screen()
         stats = [
             ['Requests per Second', rps],
             ['GET count', get_count],
@@ -63,7 +66,7 @@ class PeekViewer:
         return ['Last check timestamp', datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')]
 
     def _get_access_log_size_row(self):
-        access_log_size = os.path.getsize(self._log_file.file_path)
+        access_log_size = os.path.getsize(self._log_file_path)
         return self._get_formatted_byte_row(access_log_size, 'Access Log size in {}', rounding=1)
 
     def _get_db_size_row(self):
