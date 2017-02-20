@@ -31,3 +31,4 @@ class PeekRunner:
             self._lines_parsed += 1
             current_line = LineParser.parse_line(line=incoming_connection_log)
             self._log_statistics.insert_line(line=current_line)
+            print('Lines Parsed: {}'.format(self._lines_parsed), end='\r')

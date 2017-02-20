@@ -8,7 +8,7 @@ from peek.log_statistics import LogStatistics
 
 
 class PeekViewer:
-    def __init__(self, log_file_path, db_path, refresh_rate=1):
+    def __init__(self, log_file_path, db_path, refresh_rate=5):
         self._log_file_path = log_file_path
         self._db_path = db_path
         self._refresh_rate = refresh_rate
@@ -17,9 +17,9 @@ class PeekViewer:
     def run(self):
         print('Viewing nginx log statistics')
         while True:
-            self.clear_screen()
             self.report_statistics()
             time.sleep(self._refresh_rate)
+            self.clear_screen()
 
     def report_statistics(self):
         current_time = int(time.time())
