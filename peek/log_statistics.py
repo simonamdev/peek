@@ -31,6 +31,10 @@ class LogStatistics:
         self._connection.commit()
 
     @property
+    def db_path(self):
+        return self._db_path
+
+    @property
     def persistence_mode(self):
         return self._persistence_mode
 
