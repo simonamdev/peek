@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 
@@ -53,27 +54,37 @@ class PeekRunner:
         stats = [
             ['Requests per Second', rps],
             ['GET count', get_count],
-            self.get_formatted_byte_row(),
+            self._get_formatted_byte_row(self._log_statistics.get_total_byte_count(), 'Total {} Sent'),
             ['Average Bytes sent per request', average_bytes_sent],
+            self._get_access_log_size_row(),
             ['Unique IP Addresses', distinct_ip_count],
-            ['Unique IP Addresses (last minute)', distinct_ip_count_in_timespan]
+            ['Unique IP Addresses (last minute)', distinct_ip_count_in_timespan],
+            self._get_last_checked_time_row()
         ]
         print('Nginx Statistics')
         print(tabulate(tabular_data=stats, tablefmt='grid', numalign='right'))
 
-    def get_formatted_byte_row(self):
-        byte_count = self._log_statistics.get_total_byte_count()
-        byte_string = 'Total Bytes sent'
+    @staticmethod
+    def _get_formatted_byte_row(byte_count, byte_row_string):
+        byte_string = byte_row_string.format('Bytes')
         if byte_count > 1000:
             byte_count /= 1000
-            byte_string = 'Total Kilobytes sent'
+            byte_string = byte_row_string.format('Kilobytes')
         if byte_count > 1000:
             byte_count /= 1000
-            byte_string = 'Total Megabytes sent'
+            byte_string = byte_row_string.format('Megabytes')
         if byte_count > 1000:
             byte_count /= 1000
-            byte_string = 'Total Gigabytes sent'
+            byte_string = byte_row_string.format('Gigabytes')
         return [byte_string, round(byte_count, 2)]
+
+    @staticmethod
+    def _get_last_checked_time_row():
+        return ['Last check timestamp', datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')]
+
+    def _get_access_log_size_row(self):
+        access_log_size = os.path.getsize(self._log_file.file_path)
+        return self._get_formatted_byte_row(access_log_size, 'Access Log size in {}')
 
     @staticmethod
     def clear_screen():
