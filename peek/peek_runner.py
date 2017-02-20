@@ -44,7 +44,6 @@ class PeekRunner:
             timespan_start=one_minute_ago,
             timespan_end=current_time)
         get_count = self._log_statistics.get_verb_occurrences()['GET']
-        total_bytes_sent = self._log_statistics.get_total_byte_count()
         average_bytes_sent = self._log_statistics.get_average_byte_count()
         distinct_ip_count = self._log_statistics.get_number_of_distinct_ip_addresses()
         distinct_ip_count_in_timespan = self._log_statistics.get_number_of_distinct_ip_addresses_in_timespan(
@@ -54,13 +53,27 @@ class PeekRunner:
         stats = [
             ['Requests per Second', rps],
             ['GET count', get_count],
-            ['Total Bytes sent', total_bytes_sent],
+            self.get_formatted_byte_row(),
             ['Average Bytes sent per request', average_bytes_sent],
             ['Unique IP Addresses', distinct_ip_count],
             ['Unique IP Addresses (last minute)', distinct_ip_count_in_timespan]
         ]
         print('Nginx Statistics')
         print(tabulate(tabular_data=stats, tablefmt='grid', numalign='right'))
+
+    def get_formatted_byte_row(self):
+        byte_count = self._log_statistics.get_total_byte_count()
+        byte_string = 'Total Bytes sent'
+        if byte_count > 1000:
+            byte_count /= 1000
+            byte_string = 'Total Kilobytes sent'
+        if byte_count > 1000:
+            byte_count /= 1000
+            byte_string = 'Total Megabytes sent'
+        if byte_count > 1000:
+            byte_count /= 1000
+            byte_string = 'Total Gigabytes sent'
+        return [byte_string, byte_count]
 
     @staticmethod
     def clear_screen():
