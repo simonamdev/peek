@@ -84,13 +84,13 @@ class PeekRunner:
 
     def _get_access_log_size_row(self):
         access_log_size = os.path.getsize(self._log_file.file_path)
-        return self._get_formatted_byte_row(access_log_size, 'Access Log size in {}')
+        return self._get_formatted_byte_row(access_log_size, 'Access Log size in {}', rounding=1)
 
     def _get_db_size_row(self):
         db_size = 0
         if not self._log_statistics.db_path == ':memory:':
             db_size = os.path.getsize(self._log_statistics.db_path)
-        return self._get_formatted_byte_row(db_size, 'Database size in {}')
+        return self._get_formatted_byte_row(db_size, 'Database size in {}', rounding=1)
 
     @staticmethod
     def clear_screen():
