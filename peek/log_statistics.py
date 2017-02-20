@@ -97,7 +97,7 @@ class LogStatistics:
                    'WHERE timestamp >= ? AND timestamp <= ?'
         ip_data = (timespan_start, timespan_end)
         query_amount = self._cursor.execute(ip_query, ip_data).fetchone()[0]
-        return round(query_amount / 60, 2)
+        return query_amount
 
     def get_verb_occurrences(self):
         return self.__get_number_of_occurrences(field='verb')
