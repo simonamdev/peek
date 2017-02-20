@@ -5,6 +5,7 @@ import time
 from tabulate import tabulate
 
 from peek.log_statistics import LogStatistics
+from tests.file_paths import test_log_file_path
 
 
 class PeekViewer:
@@ -81,3 +82,9 @@ class PeekViewer:
             os.system('cls')
         else:
             os.system('clear')
+
+
+if __name__ == '__main__':
+    import cProfile
+    pv = PeekViewer(log_file_path=test_log_file_path, db_path='logs')
+    cProfile.run('pv.report_statistics()')
