@@ -73,7 +73,7 @@ class PeekRunner:
         if byte_count > 1000:
             byte_count /= 1000
             byte_string = 'Total Gigabytes sent'
-        return [byte_string, byte_count]
+        return [byte_string, round(byte_count, 2)]
 
     @staticmethod
     def clear_screen():
