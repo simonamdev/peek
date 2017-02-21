@@ -1,3 +1,4 @@
 tests/files/real_access.log
 .idea/
 *.pyc
+peek.egg-info/

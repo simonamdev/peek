@@ -2,7 +2,7 @@ import datetime
 import os
 import time
 
-from tabulate import tabulate
+from asciimatics.screen import Screen
 
 from peek.log_statistics import LogStatistics
 from tests.file_paths import test_log_file_path
@@ -15,76 +15,120 @@ class PeekViewer:
         self._refresh_rate = refresh_rate
         self._log_statistics = LogStatistics(persist=True)
 
-    def run(self):
-        print('Viewing nginx log statistics')
-        while True:
-            self.report_statistics()
-            time.sleep(self._refresh_rate)
-            self.clear_screen()
-
-    def report_statistics(self):
+    def get_requests_per_second(self):
         current_time = int(time.time())
         one_minute_ago = int(time.time()) - 60
-        rps = self._log_statistics.get_requests_per_second_in_timespan(
+        return self._log_statistics.get_requests_per_second_in_timespan(
             timespan_start=one_minute_ago,
             timespan_end=current_time)
-        get_count = self._log_statistics.get_verb_occurrences()['GET']
-        average_bytes_sent = self._log_statistics.get_average_byte_count()
-        distinct_ip_count = self._log_statistics.get_number_of_distinct_ip_addresses()
-        distinct_ip_count_in_timespan = self._log_statistics.get_number_of_distinct_ip_addresses_in_timespan(
-            timespan_start=one_minute_ago,
-            timespan_end=current_time)
-        stats = [
-            ['Requests per Second', rps],
-            ['GET count', get_count],
-            self._get_formatted_byte_row(self._log_statistics.get_total_byte_count(), 'Total {} Sent', rounding=2),
-            ['Average Bytes sent per request', round(average_bytes_sent, 2)],
-            self._get_access_log_size_row(),
-            self._get_db_size_row(),
-            ['Total Unique IP Addresses', distinct_ip_count],
-            ['Unique IP Addresses (last minute)', distinct_ip_count_in_timespan],
-            self._get_last_checked_time_row()
-        ]
-        print('Nginx Statistics')
-        print(tabulate(tabular_data=stats, tablefmt='grid', numalign='right'))
+
+    def get_total_request_count(self, request_verb='GET'):
+        return self._log_statistics.get_verb_occurrences()[request_verb]
+
+    def get_unique_ip_address_count(self):
+        return self._log_statistics.get_number_of_distinct_ip_addresses()
 
     @staticmethod
-    def _get_formatted_byte_row(byte_count, byte_row_string, rounding=0):
-        byte_string = byte_row_string.format('Bytes')
-        if byte_count > 1000:
+    def _format_bytes_string(byte_count, byte_format='B', rounding=2):
+        byte_words = {
+            'B': 'Bytes',
+            'KB': 'Kilobytes',
+            'MB': 'Megabytes',
+            'GB': 'Gigabytes'
+        }
+        if byte_format == 'KB':
             byte_count /= 1000
-            byte_string = byte_row_string.format('Kilobytes')
-        if byte_count > 1000:
-            byte_count /= 1000
-            byte_string = byte_row_string.format('Megabytes')
-        if byte_count > 1000:
-            byte_count /= 1000
-            byte_string = byte_row_string.format('Gigabytes')
-        return [byte_string, round(byte_count, rounding)]
+        elif byte_format == 'MB':
+            byte_count /= 1000000
+        return '{} {}'.format(round(byte_count, rounding), byte_words[byte_format])
+
+    def get_total_bytes_sent(self, byte_format='B'):
+        byte_count = self._log_statistics.get_total_byte_count()
+        return self._format_bytes_string(byte_count=byte_count, byte_format=byte_format)
 
     @staticmethod
-    def _get_last_checked_time_row():
+    def get_last_checked_time():
         return ['Last check timestamp', datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S')]
 
-    def _get_access_log_size_row(self):
+    def get_access_log_size_row(self, byte_format):
         access_log_size = os.path.getsize(self._log_file_path)
-        return self._get_formatted_byte_row(access_log_size, 'Access Log size in {}', rounding=1)
+        return self._format_bytes_string(byte_count=access_log_size, byte_format=byte_format, rounding=2)
 
-    def _get_db_size_row(self):
+    def get_db_size_row(self, byte_format):
         db_size = 0
         if not self._log_statistics.db_path == ':memory:':
             db_size = os.path.getsize(self._log_statistics.db_path)
-        return self._get_formatted_byte_row(db_size, 'Database size in {}', rounding=1)
+        return self._format_bytes_string(byte_count=db_size, byte_format=byte_format, rounding=2)
+
+    def draw_screen(self, screen):
+        # draw the border
+        self.draw_border(screen=screen)
+        # print layout once
+        for data in self.get_static_screen_data():
+            screen.print_at(data[0], data[1], data[2])
+        while True:
+            # update only the values
+            for data in self.get_dynamic_screen_data():
+                screen.print_at(data[0], data[1], data[2])
+            ev = screen.get_key()
+            if ev in (ord('Q'), ord('q')):
+                return
+            screen.refresh()
 
     @staticmethod
-    def clear_screen():
-        if os.name == 'nt':
-            os.system('cls')
-        else:
-            os.system('clear')
+    def draw_border(screen):
+        # Top Bar
+        screen.move(1, 0)
+        screen.draw(79, 0, char='─')
+        # Left Bar
+        screen.move(0, 1)
+        screen.draw(0, 24, char='│')
+        # Bottom Bar
+        screen.move(1, 24)
+        screen.draw(79, 24, char='─')
+        # Right Bar
+        screen.move(79, 1)
+        screen.draw(79, 24, char='│')
+        # Corners
+        screen.print_at('┌', 0, 0)
+        screen.print_at('┐', 79, 0)
+        screen.print_at('└', 0, 24)
+        screen.print_at('┘', 79, 24)
+
+    def draw_static_data(self, screen):
+        pass
+
+    def draw_dynamic_data(self, screen):
+        pass
+
+    @staticmethod
+    def get_static_screen_data():
+        static_x_coord = 1
+        return (
+            ('Nginx Statistics', static_x_coord, 1),
+            ('Requests per second:', static_x_coord, 2),
+            ('Total request count:', static_x_coord, 3),
+            ('Unique IP Address count:', static_x_coord, 4),
+            ('Total data sent:', static_x_coord, 5),
+            ('Current access log size:', static_x_coord, 6),
+            ('Current access DB size:', static_x_coord, 7),
+            ('Last checked timestamp:', static_x_coord, 8)
+        )
+
+    def get_dynamic_screen_data(self):
+        dynamic_x_coord = 26
+        return (
+            ('{} rps'.format(self.get_requests_per_second()), dynamic_x_coord, 2),
+            (str(self.get_total_request_count()), dynamic_x_coord, 3),
+            (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
+            (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 5),
+            (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 6),
+            (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 7),
+            (self.get_last_checked_time(), dynamic_x_coord, 8)
+        )
 
 
 if __name__ == '__main__':
-    import cProfile
-    pv = PeekViewer(log_file_path=test_log_file_path, db_path='logs')
-    cProfile.run('pv.report_statistics()', sort=1)
+    # import cProfile
+    # cProfile.run('pv.get_dynamic_screen_data()', sort=1)
+    pass
