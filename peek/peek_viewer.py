@@ -18,9 +18,9 @@ class PeekViewer:
     def get_requests_per_second(self):
         current_time = int(time.time())
         one_minute_ago = int(time.time()) - 60
-        return self._log_statistics.get_requests_per_second_in_timespan(
+        return round(self._log_statistics.get_requests_per_second_in_timespan(
             timespan_start=one_minute_ago,
-            timespan_end=current_time)
+            timespan_end=current_time), 2)
 
     def get_total_request_count(self, request_verb='GET'):
         return self._log_statistics.get_verb_occurrences()[request_verb]
@@ -44,7 +44,7 @@ class PeekViewer:
 
     def get_total_bytes_sent(self, byte_format='B'):
         byte_count = self._log_statistics.get_total_byte_count()
-        return self._format_bytes_string(byte_count=byte_count, byte_format=byte_format)
+        return self._format_bytes_string(byte_count=byte_count, byte_format=byte_format, rounding=1)
 
     @staticmethod
     def get_last_checked_time():
@@ -52,13 +52,13 @@ class PeekViewer:
 
     def get_access_log_size_row(self, byte_format):
         access_log_size = os.path.getsize(self._log_file_path)
-        return self._format_bytes_string(byte_count=access_log_size, byte_format=byte_format, rounding=2)
+        return self._format_bytes_string(byte_count=access_log_size, byte_format=byte_format, rounding=1)
 
     def get_db_size_row(self, byte_format):
         db_size = 0
         if not self._log_statistics.db_path == ':memory:':
             db_size = os.path.getsize(self._log_statistics.db_path)
-        return self._format_bytes_string(byte_count=db_size, byte_format=byte_format, rounding=2)
+        return self._format_bytes_string(byte_count=db_size, byte_format=byte_format, rounding=1)
 
     def draw_screen(self, screen):
         # draw the border
@@ -74,26 +74,27 @@ class PeekViewer:
             if ev in (ord('Q'), ord('q')):
                 return
             screen.refresh()
+            time.sleep(1)
 
     @staticmethod
     def draw_border(screen):
         # Top Bar
         screen.move(1, 0)
-        screen.draw(79, 0, char='─')
+        screen.draw(79, 0, char='-')
         # Left Bar
         screen.move(0, 1)
-        screen.draw(0, 24, char='│')
+        screen.draw(0, 24, char='|')
         # Bottom Bar
-        screen.move(1, 24)
-        screen.draw(79, 24, char='─')
+        screen.move(1, 23)
+        screen.draw(79, 23, char='-')
         # Right Bar
         screen.move(79, 1)
-        screen.draw(79, 24, char='│')
+        screen.draw(79, 24, char='|')
         # Corners
-        screen.print_at('┌', 0, 0)
-        screen.print_at('┐', 79, 0)
-        screen.print_at('└', 0, 24)
-        screen.print_at('┘', 79, 24)
+        screen.print_at('+', 0, 0)
+        screen.print_at('+', 79, 0)
+        screen.print_at('+', 0, 23)
+        screen.print_at('+', 79, 23)
 
     def draw_static_data(self, screen):
         pass
@@ -118,7 +119,7 @@ class PeekViewer:
     def get_dynamic_screen_data(self):
         dynamic_x_coord = 26
         return (
-            ('{} rps'.format(self.get_requests_per_second()), dynamic_x_coord, 2),
+            (str(self.get_requests_per_second()), dynamic_x_coord, 2),
             (str(self.get_total_request_count()), dynamic_x_coord, 3),
             (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
             (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 5),
