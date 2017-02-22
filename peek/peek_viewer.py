@@ -28,6 +28,12 @@ class PeekViewer:
     def get_unique_ip_address_count(self):
         return self._log_statistics.get_number_of_distinct_ip_addresses()
 
+    def get_recent_unique_ip_address_count(self):
+        now = int(time.time())
+        return self._log_statistics.get_number_of_distinct_ip_addresses_in_timespan(
+            timespan_start=now - 60,
+            timespan_end=now)
+
     @staticmethod
     def _format_bytes_string(byte_count, byte_format='B', rounding=2):
         byte_words = {
@@ -110,11 +116,21 @@ class PeekViewer:
             ('Requests per second:', static_x_coord, 2),
             ('Total request count:', static_x_coord, 3),
             ('Unique IP Address count:', static_x_coord, 4),
-            ('Total data sent:', static_x_coord, 5),
-            ('Current access log size:', static_x_coord, 6),
-            ('Current access DB size:', static_x_coord, 7),
-            ('Last checked timestamp:', static_x_coord, 8)
+            ('Recent Unique IP count:', static_x_coord, 5),
+            ('Total data sent:', static_x_coord, 6),
+            ('Current access log size:', static_x_coord, 7),
+            ('Current access DB size:', static_x_coord, 8),
+            ('Last checked timestamp:', static_x_coord, 9)
         )
+
+    @staticmethod
+    def _left_pad(string_to_pad, required_length, pad_character):
+        string_to_pad = str(string_to_pad)
+        string_length = len(string_to_pad)
+        if string_length < required_length:
+            for i in range(0, required_length - string_length):
+                string_to_pad = '{}{}'.format(pad_character, string_to_pad)
+        return string_to_pad
 
     def get_dynamic_screen_data(self):
         dynamic_x_coord = 26
@@ -122,10 +138,11 @@ class PeekViewer:
             (str(self.get_requests_per_second()), dynamic_x_coord, 2),
             (str(self.get_total_request_count()), dynamic_x_coord, 3),
             (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
-            (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 5),
-            (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 6),
-            (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 7),
-            (self.get_last_checked_time(), dynamic_x_coord, 8)
+            (self._left_pad(self.get_recent_unique_ip_address_count(), 3, '0'), dynamic_x_coord, 5),
+            (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 6),
+            (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 7),
+            (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 8),
+            (self.get_last_checked_time(), dynamic_x_coord, 9)
         )
 
 
