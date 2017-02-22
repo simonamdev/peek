@@ -2,10 +2,7 @@ import datetime
 import os
 import time
 
-from asciimatics.screen import Screen
-
 from peek.log_statistics import LogStatistics
-from tests.file_paths import test_log_file_path
 
 
 class PeekViewer:
