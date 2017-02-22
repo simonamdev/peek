@@ -22,14 +22,14 @@ class PeekViewer:
     def get_total_request_count(self, request_verb='GET'):
         return self._log_statistics.get_verb_occurrences()[request_verb]
 
-    def get_unique_ip_address_count(self):
+    def get_unique_ip_address_count(self, time_limited=False):
+        if time_limited:
+            now = int(time.time())
+            one_minute_ago = now - 60
+            return self._log_statistics.get_number_of_distinct_ip_addresses(
+                timespan_start=one_minute_ago,
+                timespan_end=now)
         return self._log_statistics.get_number_of_distinct_ip_addresses()
-
-    def get_recent_unique_ip_address_count(self):
-        now = int(time.time())
-        return self._log_statistics.get_number_of_distinct_ip_addresses_in_timespan(
-            timespan_start=now - 60,
-            timespan_end=now)
 
     @staticmethod
     def _format_bytes_string(byte_count, byte_format='B', rounding=2):
@@ -135,7 +135,7 @@ class PeekViewer:
             (str(self.get_requests_per_second()), dynamic_x_coord, 2),
             (str(self.get_total_request_count()), dynamic_x_coord, 3),
             (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
-            (self._left_pad(self.get_recent_unique_ip_address_count(), 3, '0'), dynamic_x_coord, 5),
+            (self._left_pad(self.get_unique_ip_address_count(time_limited=True), 3, '0'), dynamic_x_coord, 5),
             (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 6),
             (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 7),
             (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 8),
