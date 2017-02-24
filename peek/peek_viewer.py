@@ -10,14 +10,18 @@ class PeekViewer:
         self._log_file_path = log_file_path
         self._db_path = db_path
         self._refresh_rate = refresh_rate
+        self._last_total_request_count = 0
         self._log_statistics = LogStatistics(persist=True)
 
-    def get_requests_per_second(self):
-        current_time = int(time.time())
-        one_minute_ago = int(time.time()) - 60
-        return round(self._log_statistics.get_requests_per_second_in_timespan(
-            timespan_start=one_minute_ago,
-            timespan_end=current_time), 2)
+    def get_requests_per_second(self, new_request_count):
+        rps = (new_request_count - self._last_total_request_count) / self._refresh_rate
+        self._last_total_request_count = new_request_count
+        return round(rps, 3)
+        # current_time = int(time.time())
+        # one_minute_ago = int(time.time()) - 60
+        # return round(self._log_statistics.get_requests_per_second_in_timespan(
+        #     timespan_start=one_minute_ago,
+        #     timespan_end=current_time), 2)
 
     def get_total_request_count(self, request_verb='GET'):
         return self._log_statistics.get_verb_occurrences()[request_verb]
@@ -121,21 +125,27 @@ class PeekViewer:
         )
 
     @staticmethod
-    def _left_pad(string_to_pad, required_length, pad_character):
+    def _pad(string_to_pad, required_length, pad_character, left=True):
         string_to_pad = str(string_to_pad)
         string_length = len(string_to_pad)
         if string_length < required_length:
             for i in range(0, required_length - string_length):
-                string_to_pad = '{}{}'.format(pad_character, string_to_pad)
+                if left:
+                    string_to_pad = '{}{}'.format(pad_character, string_to_pad)
+                else:
+                    string_to_pad = '{}{}'.format(string_to_pad, pad_character)
         return string_to_pad
 
     def get_dynamic_screen_data(self):
         dynamic_x_coord = 26
+        total_request_count = self.get_total_request_count()
+        rps = str(self.get_requests_per_second(new_request_count=total_request_count))
+        unique_ip_count = self.get_unique_ip_address_count(time_limited=True)
         return (
-            (str(self.get_requests_per_second()), dynamic_x_coord, 2),
-            (str(self.get_total_request_count()), dynamic_x_coord, 3),
+            (self._pad(rps, required_length=10, pad_character=' ', left=False), dynamic_x_coord, 2),
+            (str(total_request_count), dynamic_x_coord, 3),
             (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
-            (self._left_pad(self.get_unique_ip_address_count(time_limited=True), 3, '0'), dynamic_x_coord, 5),
+            (self._pad(unique_ip_count, 3, '0'), dynamic_x_coord, 5),
             (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 6),
             (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 7),
             (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 8),
