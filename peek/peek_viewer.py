@@ -11,10 +11,14 @@ class PeekViewer:
         self._db_path = db_path
         self._refresh_rate = refresh_rate
         self._last_total_request_count = 0
+        self._last_check_timestamp = 0
         self._log_statistics = LogStatistics(persist=True)
 
     def get_requests_per_second(self, new_request_count):
-        rps = (new_request_count - self._last_total_request_count) / self._refresh_rate
+        current_check_timestamp = int(time.time())
+        seconds_since_last_check = current_check_timestamp - self._last_check_timestamp
+        rps = (new_request_count - self._last_total_request_count) / seconds_since_last_check
+        self._last_check_timestamp = current_check_timestamp
         self._last_total_request_count = new_request_count
         return round(rps, 3)
         # current_time = int(time.time())
@@ -118,7 +122,7 @@ class PeekViewer:
             ('Requests per second:', static_x_coord, 2),
             ('Total request count:', static_x_coord, 3),
             ('Unique IP Address count:', static_x_coord, 4),
-            ('Recent Unique IP count:', static_x_coord, 5),
+            # ('Recent Unique IP count:', static_x_coord, 5),
             ('Total data sent:', static_x_coord, 6),
             ('Current access log size:', static_x_coord, 7),
             ('Current access DB size:', static_x_coord, 8),
@@ -141,16 +145,21 @@ class PeekViewer:
         dynamic_x_coord = 26
         total_request_count = self.get_total_request_count()
         rps = str(self.get_requests_per_second(new_request_count=total_request_count))
-        unique_ip_count = self.get_unique_ip_address_count(time_limited=True)
+        # unique_ip_count_time_limited = self.get_unique_ip_address_count(time_limited=True)
+        unique_ip_count = self.get_unique_ip_address_count()
+        total_data_sent = self.get_total_bytes_sent(byte_format='MB')
+        log_file_size = self.get_access_log_size_row(byte_format='MB')
+        db_size = self.get_db_size_row(byte_format='MB')
+        last_checked_timestamp = self.get_last_checked_time()
         return (
-            (self._pad(rps, required_length=10, pad_character=' ', left=False), dynamic_x_coord, 2),
+            (self._pad(rps, required_length=8, pad_character=' ', left=False), dynamic_x_coord, 2),
             (str(total_request_count), dynamic_x_coord, 3),
-            (str(self.get_unique_ip_address_count()), dynamic_x_coord, 4),
-            (self._pad(unique_ip_count, 3, '0'), dynamic_x_coord, 5),
-            (self.get_total_bytes_sent(byte_format='MB'), dynamic_x_coord, 6),
-            (self.get_access_log_size_row(byte_format='MB'), dynamic_x_coord, 7),
-            (self.get_db_size_row(byte_format='MB'), dynamic_x_coord, 8),
-            (self.get_last_checked_time(), dynamic_x_coord, 9)
+            (str(unique_ip_count), dynamic_x_coord, 4),
+            # (self._pad(unique_ip_count_time_limited, 3, '0'), dynamic_x_coord, 5),
+            (total_data_sent, dynamic_x_coord, 6),
+            (log_file_size, dynamic_x_coord, 7),
+            (db_size, dynamic_x_coord, 8),
+            (last_checked_timestamp, dynamic_x_coord, 9)
         )
 
 
