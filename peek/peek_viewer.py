@@ -19,9 +19,10 @@ class PeekViewer:
         return round(rps, 3)
         # current_time = int(time.time())
         # one_minute_ago = int(time.time()) - 60
-        # return round(self._log_statistics.get_requests_per_second_in_timespan(
+        # rps = round(self._log_statistics.get_requests_per_second_in_timespan(
         #     timespan_start=one_minute_ago,
         #     timespan_end=current_time), 2)
+        # return rps
 
     def get_total_request_count(self, request_verb='GET'):
         return self._log_statistics.get_verb_occurrences()[request_verb]
@@ -81,7 +82,7 @@ class PeekViewer:
             if ev in (ord('Q'), ord('q')):
                 return
             screen.refresh()
-            time.sleep(1)
+            time.sleep(self._refresh_rate)
 
     @staticmethod
     def draw_border(screen):

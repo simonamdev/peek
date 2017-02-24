@@ -26,6 +26,12 @@ def create_peek_args_parser():
         action='store_true'
     )
     parser.add_argument(
+        '--view-interval',
+        dest='view_interval',
+        type=int,
+        help='The interval in seconds that the viewer will query the database. Default is 3'
+    )
+    parser.add_argument(
         '--version',
         help='Display Peek\'s version',
         action='store_true'
@@ -34,22 +40,12 @@ def create_peek_args_parser():
 
 # globals, due to asciimatics not accepting other params to the screen
 log_file_path = ''
+refresh_rate = 3
 
 
 def run_viewer_screen(screen):
-    pv = PeekViewer(log_file_path=log_file_path, db_path='logs')
+    pv = PeekViewer(log_file_path=log_file_path, db_path='logs', refresh_rate=refresh_rate)
     pv.draw_screen(screen=screen)
-    # # print layout once
-    # for data in pv.get_static_screen_data():
-    #     screen.print_at(data[0], data[1], data[2])
-    # while True:
-    #     # update only the values
-    #     for data in pv.get_dynamic_screen_data():
-    #         screen.print_at(data[0], data[1], data[2])
-    #     ev = screen.get_key()
-    #     if ev in (ord('Q'), ord('q')):
-    #         return
-    #     screen.refresh()
 
 
 if __name__ == '__main__':
@@ -66,6 +62,8 @@ if __name__ == '__main__':
     try:
         if args.view:
             # TODO: Change from hardcoded logs db path
+            if args.view_interval:
+                refresh_rate = args.view_interval
             Screen.wrapper(run_viewer_screen)
         else:
             peek_runner = PeekRunner(file_path=log_file_path)

@@ -30,6 +30,7 @@ class LogStatistics:
         self._cursor.execute(create_table_query)
         self._connection.commit()
 
+
     @property
     def db_path(self):
         return self._db_path
@@ -130,9 +131,9 @@ class LogStatistics:
         return self.__get_number_of_occurrences(field='useragent')
 
     def get_requests_per_second_in_timespan(self, timespan_start, timespan_end):
-        rps_query = 'SELECT COUNT(*)' \
-                    'FROM `logs`' \
-                    'WHERE timestamp >= ? AND timestamp <= ?'
+        rps_query = 'SELECT * ' \
+                    'FROM logs ' \
+                    'WHERE timestamp >= ? AND timestamp <= ?;'
         rps_data = (timespan_start, timespan_end)
         query_amount = self._cursor.execute(rps_query, rps_data).fetchone()[0]
         return round(query_amount / 60, 3)
