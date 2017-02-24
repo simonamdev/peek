@@ -20,7 +20,7 @@ class PeekViewer:
         rps = (new_request_count - self._last_total_request_count) / seconds_since_last_check
         self._last_check_timestamp = current_check_timestamp
         self._last_total_request_count = new_request_count
-        return round(rps, 3)
+        return round(rps, 1)
         # current_time = int(time.time())
         # one_minute_ago = int(time.time()) - 60
         # rps = round(self._log_statistics.get_requests_per_second_in_timespan(
@@ -152,7 +152,7 @@ class PeekViewer:
         db_size = self.get_db_size_row(byte_format='MB')
         last_checked_timestamp = self.get_last_checked_time()
         return (
-            (self._pad(rps, required_length=8, pad_character=' ', left=False), dynamic_x_coord, 2),
+            (self._pad(rps, required_length=5, pad_character=' ', left=False), dynamic_x_coord, 2),
             (str(total_request_count), dynamic_x_coord, 3),
             (str(unique_ip_count), dynamic_x_coord, 4),
             # (self._pad(unique_ip_count_time_limited, 3, '0'), dynamic_x_coord, 5),
