@@ -30,6 +30,7 @@ class LogStatistics:
         self._cursor.execute(create_table_query)
         self._connection.commit()
 
+
     @property
     def db_path(self):
         return self._db_path
@@ -87,21 +88,24 @@ class LogStatistics:
         self._cursor.execute(insert_query, insert_data)
         self._connection.commit()
 
+    @staticmethod
+    def _time_limit_query(query, timespan_start=None, timespan_end=None):
+        if not isinstance(timespan_start, int) or not isinstance(timespan_end, int):
+            return query + ';'
+        if None in (timespan_start, timespan_end):
+            return query + ':'
+        return query + ' WHERE timestamp >= {} AND timestamp <= {};'.format(
+            timespan_start,
+            timespan_end)
+
     def get_ip_address_occurrences(self):
         return self.__get_number_of_occurrences(field='ip')
 
-    def get_number_of_distinct_ip_addresses(self):
+    def get_number_of_distinct_ip_addresses(self, timespan_start=None, timespan_end=None):
         select_query = 'SELECT COUNT(DISTINCT ip)' \
-                       'FROM `logs`;'
-        return self._cursor.execute(select_query).fetchall()[0][0]
-
-    def get_number_of_distinct_ip_addresses_in_timespan(self, timespan_start, timespan_end):
-        ip_query = 'SELECT COUNT(DISTINCT ip)' \
-                   'FROM `logs`' \
-                   'WHERE timestamp >= ? AND timestamp <= ?'
-        ip_data = (timespan_start, timespan_end)
-        query_amount = self._cursor.execute(ip_query, ip_data).fetchone()[0]
-        return query_amount
+                       'FROM `logs`'
+        query = self._time_limit_query(select_query, timespan_start=timespan_start, timespan_end=timespan_end)
+        return self._cursor.execute(query).fetchall()[0][0]
 
     def get_verb_occurrences(self):
         return self.__get_number_of_occurrences(field='verb')
@@ -127,9 +131,9 @@ class LogStatistics:
         return self.__get_number_of_occurrences(field='useragent')
 
     def get_requests_per_second_in_timespan(self, timespan_start, timespan_end):
-        rps_query = 'SELECT COUNT(*)' \
-                    'FROM `logs`' \
-                    'WHERE timestamp >= ? AND timestamp <= ?'
+        rps_query = 'SELECT * ' \
+                    'FROM logs ' \
+                    'WHERE timestamp >= ? AND timestamp <= ?;'
         rps_data = (timespan_start, timespan_end)
         query_amount = self._cursor.execute(rps_query, rps_data).fetchone()[0]
         return round(query_amount / 60, 3)
